@@ -115,10 +115,18 @@ function http_request_args( $parsed_args, $url ) {
 	}
 
 	/*
-	TODO: What if the URL path is something like /plugins/update-check/1.2/ ?
+	Check the version number.
+	The version number is currently '1.1' but it is likely to change to '1.2' in the future.
+	See https://core.trac.wordpress.org/ticket/30465 for details.
+	We will assume the version is acceptable if the major version number is 1.
 	*/
 	$path = $parsed_url['path'];
-	if ( $path !== '/plugins/update-check/1.1/' ) {
+	if ( ! preg_match( '#^/plugins/update-check/([^/]+)/$#D', $path, $matches ) ) {
+		return $parsed_args;
+	}
+	$version = $matches[1];
+	$version_components = explode( '.', $version );
+	if ( $version_components[0] !== '1' ) {
 		return $parsed_args;
 	}
 
